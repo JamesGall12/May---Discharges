@@ -391,7 +391,7 @@
         let averages = {};
         let sortConfig = { key: null, direction: null };
 
-        // Your May discharge data
+        // Your ACTUAL May discharge data - only practitioners from the CSV file
         const csvData = `Practitioner,Total Consults,Patient Request Discharges,Patient Requested %,Practitioner Request Discharges,Practitioner Requested %,Discharge Rate
 Julius,165,6,3.64%,1,0.61%,4%
 Dr. Aarons,73,2,2.74%,1,1.37%,4%
@@ -406,15 +406,10 @@ Jordan - ,0,1,#DIV/0!,0,#DIV/0!,N/A
 Emma,63,0,,0,,
 Hollie,42,0,,0,,
 James,27,0,,0,,
-Thomas,46,0,,0,,
-Vanessa,61,0,,0,,
-Laura,0,1,#DIV/0!,0,#DIV/0!,N/A
-Kushal total,113,7,,5,,
-Dr. dia total,25,0,,2,,
-Total,852,56,6.58%,37,4.34%,8%`;
+Thomas,46,0,,0,,`;
 
         function parsePercentage(value) {
-            if (!value || value === '#DIV/0!' || value === 'N/A' || value === null || value === '') return NaN;
+            if (!value || value === '#DIV/0!' || value === 'N/A' || value === null || value === '' || value === undefined) return NaN;
             if (typeof value === 'string') {
                 return parseFloat(value.replace('%', ''));
             }
@@ -422,7 +417,7 @@ Total,852,56,6.58%,37,4.34%,8%`;
         }
 
         function formatPercentage(value) {
-            if (isNaN(value)) return '0.00%';
+            if (isNaN(value)) return 'N/A';
             return `${value.toFixed(2)}%`;
         }
 
@@ -433,15 +428,8 @@ Total,852,56,6.58%,37,4.34%,8%`;
 
             for (let i = 1; i < lines.length; i++) {
                 const row = lines[i].split(',');
-                if (row[0] && row[0].trim() && !row[0].toLowerCase().includes('total')) {
+                if (row[0] && row[0].trim()) {
                     const practitioner = row[0].trim();
-                    
-                    // Skip duplicate/summary rows
-                    if (practitioner.toLowerCase().includes('total') || 
-                        practitioner.toLowerCase().includes('kushal total') ||
-                        practitioner.toLowerCase().includes('dr. dia total')) {
-                        continue;
-                    }
                     
                     data.push({
                         practitioner: practitioner,
